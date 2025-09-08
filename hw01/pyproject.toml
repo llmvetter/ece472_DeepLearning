@@ -17,6 +17,10 @@ dependencies = [
     "jaxlib",
     "flax",
     "colorama",
+    "pydantic>=2.11.7",
+    "pydantic-settings>=2.10.1",
+    "matplotlib>=3.10.6",
+    "tqdm>=4.67.1",
 ]
 
 [project.scripts]
