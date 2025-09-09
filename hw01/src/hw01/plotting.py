@@ -24,7 +24,7 @@ def plot_fit(
     data: Data,
     settings: PlottingSettings,
 ):
-    """Plots the linear fit and saves it to a file."""
+    """Plots the RBF fit and saves it to a file."""
     log.info("Plotting fit")
     fig, ax = plt.subplots(1, 1, figsize=settings.figsize, dpi=settings.dpi)
 
@@ -33,6 +33,11 @@ def plot_fit(
     ax.set_ylim(-np.amax(data.y) * 1.5, np.amax(data.y) * 1.5)
     h = ax.set_ylabel("y", labelpad=10)
     h.set_rotation(0)
+    x_sin = np.linspace(0, 2, 500)
+    y_sin = np.sin(2 * np.pi * x_sin)
+    ax.plot(
+        x_sin, y_sin, color="gray", linestyle="--", zorder=0, label="True Sine Wave"
+    )
 
     xs = np.linspace(0, 2, 100)
     xs = xs[:, np.newaxis]
