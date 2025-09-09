@@ -33,6 +33,7 @@ def main() -> None:
     )
 
     model = NNXLinearModel(
+        n_kernels=settings.training.kernels,
         rngs=nnx.Rngs(params=model_key),
     )
     log.debug("Initial model", model=model.model)

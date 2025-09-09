@@ -26,7 +26,7 @@ def train_step(
 
     loss = loss_fn(model)
     grads = nnx.grad(loss_fn)(model)
-    optimizer.update(model, grads)  # In-place update of model parameters
+    optimizer.update(model, grads)
     return loss
 
 

@@ -21,7 +21,7 @@ class DataSettings(BaseModel):
 class TrainingSettings(BaseModel):
     """Settings for model training."""
 
-    # add kernels here into config
+    kernels: int = 5
     batch_size: int = 16
     num_iters: int = 300
     learning_rate: float = 0.1
