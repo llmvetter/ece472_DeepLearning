@@ -47,5 +47,10 @@ def main() -> None:
     train(model, optimizer, data, settings.training, np_rng)
 
     log.debug("Trained model", model=model.model)
+    log.info("Model Parameters", num_kernels=model.m)
+    log.info("Mus (centers)", mus=np.array(model.expansion_module.mu.value).squeeze())
+    log.info(
+        "Sigmas (widths)", sigmas=np.array(model.expansion_module.sigma.value).squeeze()
+    )
 
-    plot_fit(model, data, settings.plotting)  # add the sine wave plot util
+    plot_fit(model, data, settings.plotting)

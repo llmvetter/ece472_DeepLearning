@@ -30,7 +30,7 @@ class TrainingSettings(BaseModel):
 class PlottingSettings(BaseModel):
     """Settings for plotting."""
 
-    figsize: Tuple[int, int] = (5, 3)
+    figsize: Tuple[int, int] = (10, 5)
     dpi: int = 200
     output_dir: Path = Path("artifacts")
 
@@ -39,7 +39,7 @@ class AppSettings(BaseSettings):
     """Main application settings."""
 
     debug: bool = False
-    random_seed: int = 31415
+    random_seed: int = 31413
     data: DataSettings = DataSettings()
     training: TrainingSettings = TrainingSettings()
     plotting: PlottingSettings = PlottingSettings()
