@@ -22,7 +22,7 @@ class Data:
         self.index = np.arange(self.num_samples)
         self.x = rng.uniform(
             low=0,
-            high=2,
+            high=1,
             size=(self.num_samples, 1),
         )
         self.clean_y = np.sin(2 * np.pi * self.x)
