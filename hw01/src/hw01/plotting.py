@@ -26,24 +26,39 @@ def plot_fit(
 ):
     """Plots the RBF fit and saves it to a file."""
     log.info("Plotting fit")
-    fig, ax = plt.subplots(1, 1, figsize=settings.figsize, dpi=settings.dpi)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=settings.figsize, dpi=settings.dpi)
 
-    ax.set_title("RBF fit")
-    ax.set_xlabel("x")
-    ax.set_ylim(-np.amax(data.y) * 1.5, np.amax(data.y) * 1.5)
-    h = ax.set_ylabel("y", labelpad=10)
+    # RBF plot
+    ax1.set_title("RBF fit")
+    ax1.set_xlabel("x")
+    ax1.set_ylim(-np.amax(data.y) * 1.5, np.amax(data.y) * 1.5)
+    h = ax1.set_ylabel("y", labelpad=10)
     h.set_rotation(0)
-    x_sin = np.linspace(0, 2, 500)
+
+    # sine wave
+    x_sin = np.linspace(0, 1, 500)
     y_sin = np.sin(2 * np.pi * x_sin)
-    ax.plot(
+    ax1.plot(
         x_sin, y_sin, color="gray", linestyle="--", zorder=0, label="True Sine Wave"
     )
 
-    xs = np.linspace(0, 2, 100)
+    # RBF fit and noise points
+    xs = np.linspace(0, 1, 100)
     xs = xs[:, np.newaxis]
-    ax.plot(
+    ax1.plot(
         xs, np.squeeze(model(jnp.asarray(xs))), "-", np.squeeze(data.x), data.y, "o"
     )
+
+    # Basis function expansion
+    ax2.set_title("RBF Kernels")
+    ax2.set_xlabel("x")
+    ax2.set_ylabel("$\phi(x)$")
+    phi_values = model.expansion_module(jnp.asarray(xs))
+
+    for i in range(model.m):
+        ax2.plot(xs, phi_values[:, i], label=f"Kernel {i + 1}")
+
+    ax2.set_ylim(bottom=0)
 
     plt.tight_layout()
 
