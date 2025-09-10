@@ -25,12 +25,16 @@ class BasisExpansion(nnx.Module):
     ) -> None:
         key_mu, key_sigma = jax.random.split(key)
         self.m = n_kernels
+        # same range as x
         self.mu = nnx.Param(
-            jax.random.normal(
+            jax.random.uniform(
                 key_mu,
                 (self.m, 1),
+                minval=0,
+                maxval=1,
             ),
         )
+        # limit sigma
         self.sigma = nnx.Param(
             jax.random.uniform(
                 key_sigma,
