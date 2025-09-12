@@ -38,7 +38,7 @@ def configure_logging():
     )
 
     # Set the level for the application's logger
-    log_level = os.environ.get("LOG_LEVEL", "INFO").upper()
+    log_level = os.environ.get("LOG_LEVEL", "DEBUG").upper()
     logging.getLogger("hw02").setLevel(log_level)
 
     structlog.configure(
