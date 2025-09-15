@@ -15,6 +15,7 @@ class Data:
         self,
         rng: np.random.Generator,
     ) -> None:
+        self.index = np.arange(self.num_samples * 2)
         self.x = np.zeros((self.num_samples * 2, 2))
         self.y = np.zeros(self.num_samples * 2)
         self._rng = rng
