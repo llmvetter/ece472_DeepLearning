@@ -23,12 +23,11 @@ class TrainingSettings(BaseModel):
 
     num_inputs: int = 2
     layer_width: int = 100
-    layer_depth: int = 10
+    layer_depth: int = 2
     num_outputs: int = 1
-    kernels: int = 5
-    batch_size: int = 16
-    num_iters: int = 300
-    learning_rate: float = 0.1
+    batch_size: int = 8
+    num_iters: int = 11
+    learning_rate: float = 0.001
 
 
 class PlottingSettings(BaseModel):

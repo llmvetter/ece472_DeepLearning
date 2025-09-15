@@ -12,12 +12,13 @@ class Layer(nnx.Module):
         rngs: nnx.Rngs,
         activation: nnx.identity,
     ) -> None:
-        self.w = nnx.Param(rngs.params.uniform((din, dout)))
+        key = rngs.params()
+        self.w = nnx.Param(jax.random.normal(key, (din, dout)))
         self.b = nnx.Param(jnp.zeros((dout,)))
-        self.act = nnx.sigmoid
+        self.act = activation
 
     def __call__(self, x: jax.Array) -> jax.Array:
-        return self.act(x @ self.w + self.b)
+        return self.act(x @ self.w.value + self.b.value)
 
 
 class MLP(nnx.Module):
@@ -60,12 +61,15 @@ class MLP(nnx.Module):
             activation=output_activation,
         )
 
-    @nnx.scan(in_axes=(0, nnx.Carry), out_axes=nnx.Carry)
-    def forward(self, layer, x):
-        x = self.layer(x)
-        return x
-
     def __call__(self, x):
         x = self.in_layer(x)
-        x = self.forward(self.hidden_layers, x)
+        x = hidden_forward(
+            carry=x,
+            layer=self.hidden_layers,
+        )
         return self.out_layer(x)
+
+
+@nnx.scan(in_axes=(nnx.Carry, 0), out_axes=nnx.Carry)
+def hidden_forward(carry, layer: Layer):
+    return layer(carry)
