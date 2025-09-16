@@ -21,27 +21,6 @@ matplotlib.style.use("classic")
 matplotlib.rc("font", **font)
 
 
-def plot_data(data: Data, settings: PlottingSettings):
-    plt.figure(figsize=(8, 8))
-    plt.title("Spirals")
-    plt.scatter(
-        data.x[:, 0],
-        data.x[:, 1],
-        c=data.y,
-        s=40,
-        cmap=plt.cm.coolwarm,
-    )
-    plt.xlabel("X")
-    plt.ylabel("Y")
-    plt.axis("equal")
-    plt.tight_layout()
-
-    settings.output_dir.mkdir(parents=True, exist_ok=True)
-    output_path = settings.output_dir / "data.pdf"
-    plt.savefig(output_path)
-    log.info("Saved plot", path=str(output_path))
-
-
 def plot_boundry(model: MLP, data: Data, settings: PlottingSettings):
     # Create figure and axis
     fig, ax = plt.subplots(figsize=(8, 8))
@@ -52,10 +31,20 @@ def plot_boundry(model: MLP, data: Data, settings: PlottingSettings):
         np.linspace(-15, 15),
     )
     grid = jnp.asarray(np.vstack([feature_1.ravel(), feature_2.ravel()]).T)
-    y_pred = np.reshape(nnx.sigmoid(model(grid)), feature_1.shape)
-    display = DecisionBoundaryDisplay(xx0=feature_1, xx1=feature_2, response=y_pred)
-    display.plot()
-    display.ax_.scatter(data.x[:, 0], data.x[:, 1], c=data.y, edgecolor="black")
+    y = np.reshape(nnx.sigmoid(model(grid)), feature_1.shape)
+    display = DecisionBoundaryDisplay(
+        xx0=feature_1,
+        xx1=feature_2,
+        response=y,
+    )
+    display.plot(alpha=0.5, cmap="viridis")
+    display.ax_.scatter(
+        data.x[:, 0],
+        data.x[:, 1],
+        c=data.y,
+        edgecolor="black",
+        cmap="viridis",
+    )
 
     settings.output_dir.mkdir(parents=True, exist_ok=True)
     output_path = settings.output_dir / "boundry.pdf"

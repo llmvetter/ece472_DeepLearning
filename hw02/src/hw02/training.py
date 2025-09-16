@@ -57,7 +57,4 @@ def train(
         bar.set_description(f"Loss @ {i} => {loss:.6f}")
         bar.refresh()
 
-        if i % 10 == 0:
-            log.debug(f"Loss at timestep: {i}", loss=loss)
-
     log.info("Training finished")

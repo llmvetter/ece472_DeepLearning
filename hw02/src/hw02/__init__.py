@@ -9,7 +9,7 @@ from .data import Data
 from .model import MLP
 from .training import train
 from .logging import configure_logging
-from .plotting import plot_data, plot_boundry
+from .plotting import plot_boundry
 
 
 def main() -> None:
@@ -31,9 +31,6 @@ def main() -> None:
         num_samples=settings.data.num_samples,
     )
     data.sample()
-    log.debug("Data X", x=data.x)
-    log.debug("Data Y", y=data.y)
-    plot_data(data, settings.plotting)
 
     model = MLP(
         num_inputs=settings.training.num_inputs,
