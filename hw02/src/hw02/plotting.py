@@ -23,8 +23,6 @@ matplotlib.rc("font", **font)
 
 def plot_boundry(model: MLP, data: Data, settings: PlottingSettings):
     # Create figure and axis
-    fig, ax = plt.subplots(figsize=(8, 8))
-    ax.set_title("Boundary")
 
     feature_1, feature_2 = np.meshgrid(
         np.linspace(-15, 15),
