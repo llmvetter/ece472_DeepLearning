@@ -39,7 +39,7 @@ class AppSettings(BaseSettings):
     """Main application settings."""
 
     debug: bool = False
-    random_seed: int = 31413
+    random_seed: int = 31411
     data: DataSettings = DataSettings()
     training: TrainingSettings = TrainingSettings()
     plotting: PlottingSettings = PlottingSettings()

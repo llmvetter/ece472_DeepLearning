@@ -1,4 +1,5 @@
 import jax.numpy as jnp
+from flax import nnx
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -51,7 +52,7 @@ def plot_boundry(model: MLP, data: Data, settings: PlottingSettings):
         np.linspace(-15, 15),
     )
     grid = jnp.asarray(np.vstack([feature_1.ravel(), feature_2.ravel()]).T)
-    y_pred = np.reshape(model(grid), feature_1.shape)
+    y_pred = np.reshape(nnx.sigmoid(model(grid)), feature_1.shape)
     display = DecisionBoundaryDisplay(xx0=feature_1, xx1=feature_2, response=y_pred)
     display.plot()
     display.ax_.scatter(data.x[:, 0], data.x[:, 1], c=data.y, edgecolor="black")

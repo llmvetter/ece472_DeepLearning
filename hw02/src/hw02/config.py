@@ -14,20 +14,20 @@ from pydantic_settings import (
 class DataSettings(BaseModel):
     """Settings for data generation."""
 
-    num_samples: int = 500
-    noise: float = 0.1
+    num_samples: int = 200
+    noise: float = 0.02
 
 
 class TrainingSettings(BaseModel):
     """Settings for model training."""
 
     num_inputs: int = 2
-    layer_width: int = 100
-    layer_depth: int = 2
+    layer_width: int = 64
+    layer_depth: int = 4
     num_outputs: int = 1
-    batch_size: int = 8
-    num_iters: int = 11
-    learning_rate: float = 0.001
+    batch_size: int = 100
+    num_iters: int = 300
+    learning_rate: float = 0.002
 
 
 class PlottingSettings(BaseModel):
@@ -42,7 +42,7 @@ class AppSettings(BaseSettings):
     """Main application settings."""
 
     debug: bool = False
-    random_seed: int = 31413
+    random_seed: int = 31450
     data: DataSettings = DataSettings()
     training: TrainingSettings = TrainingSettings()
     plotting: PlottingSettings = PlottingSettings()
