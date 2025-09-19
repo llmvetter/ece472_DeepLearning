@@ -1,0 +1,27 @@
+# pyproject.toml.jinja
+
+[project]
+name = "hw03"
+version = "0.1.0"
+description = "Convolutional Neural Net for MNIST Classification."
+readme = "README.md"
+authors = [
+    { name = "Lennart Vetter", email = "my@email" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "structlog",
+    "rich",
+    "numpy",
+    "jax[cpu]",
+    "jaxlib",
+    "flax",
+    "colorama",
+]
+
+[project.scripts]
+hw03 = "hw03:main"
+
+[build-system]
+requires = ["uv_build>=0.8.3,<0.9.0"]
+build-backend = "uv_build"
