@@ -22,14 +22,17 @@ matplotlib.rc("font", **font)
 
 
 def plot_boundry(model: MLP, data: Data, settings: PlottingSettings):
-    # Create figure and axis
-
     feature_1, feature_2 = np.meshgrid(
         np.linspace(-15, 15),
         np.linspace(-15, 15),
     )
-    grid = jnp.asarray(np.vstack([feature_1.ravel(), feature_2.ravel()]).T)
-    y = np.reshape(nnx.sigmoid(model(grid)), feature_1.shape)
+    grid = jnp.asarray(
+        np.vstack([feature_1.ravel(), feature_2.ravel()]).T,
+    )
+    y = np.reshape(
+        nnx.sigmoid(model(grid)),
+        feature_1.shape,
+    )
     display = DecisionBoundaryDisplay(
         xx0=feature_1,
         xx1=feature_2,
