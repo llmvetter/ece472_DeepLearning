@@ -1,6 +1,5 @@
 import logging
 import os
-import sys
 from pathlib import Path
 
 import jax
@@ -34,7 +33,8 @@ def configure_logging():
     """Configure logging for the application."""
     logging.basicConfig(
         format="%(message)s",
-        stream=sys.stdout,
+        filename="mnist_logs.txt",
+        filemode="w",
     )
 
     # Set the level for the application's logger
@@ -51,10 +51,7 @@ def configure_logging():
             structlog.processors.StackInfoRenderer(),
             structlog.processors.format_exc_info,
             structlog.processors.UnicodeDecoder(),
-            custom_serializer_processor,
-            structlog.dev.ConsoleRenderer(
-                colors=True, exception_formatter=structlog.dev.RichTracebackFormatter()
-            ),
+            structlog.processors.KeyValueRenderer(sort_keys=True),
         ],
         context_class=dict,
         logger_factory=structlog.stdlib.LoggerFactory(),

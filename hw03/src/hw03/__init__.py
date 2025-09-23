@@ -7,7 +7,7 @@ from flax import nnx
 from .config import load_settings
 from .data import Data
 from .model import Classifier
-from .training import train
+from .training import train, test
 from .logging import configure_logging
 
 
@@ -54,4 +54,9 @@ def main() -> None:
         accuracy=nnx.metrics.Accuracy(),
         loss=nnx.metrics.Average("loss"),
     )
+
+    # Train and eval on train and test
     train(model, optimizer, data, settings.training, metrics)
+
+    # Eval model on testset, once
+    test(model, data)

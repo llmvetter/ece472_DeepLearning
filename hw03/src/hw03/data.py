@@ -63,3 +63,8 @@ class Data:
             batch_size=self.batch_size,
             drop_remainder=True,
         ).prefetch(1)
+
+        self.test_ds = test_ds.batch(
+            self.batch_size,
+            drop_remainder=True,
+        ).prefetch(1)

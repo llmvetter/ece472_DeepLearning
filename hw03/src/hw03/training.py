@@ -38,6 +38,12 @@ def eval_step(model: Classifier, metrics: nnx.MultiMetric, batch):
     metrics.update(loss=loss, logits=logits, labels=batch["label"])
 
 
+@nnx.jit
+def pred_step(model: Classifier, batch):
+    logits = model(batch["image"])
+    return logits.argmax(axis=1)
+
+
 def train(
     model: Classifier,
     optimizer: nnx.Optimizer,
@@ -67,3 +73,20 @@ def train(
             metrics.reset()
 
     log.info("Training finished")
+
+
+def test(
+    model: Classifier,
+    data: Data,
+):
+    log.info("Starting Evaluation")
+    correct = 0
+    total = 0
+    for batch in data.test_ds.as_numpy_iterator():
+        predictions = pred_step(model, batch)
+        correct_pred = (predictions == batch["label"]).sum()
+        correct += correct_pred
+        total += len(batch["label"])
+    accuracy = correct / total
+    log.info(f"Trained Model evaluated on {total} samples")
+    log.info(f"Test accuracy: {accuracy:.4f}")
