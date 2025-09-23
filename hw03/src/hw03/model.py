@@ -35,23 +35,39 @@ class Classifier(nnx.Module):
         num_classes: int,
         rngs: nnx.Rngs,
     ) -> None:
-        # add dynamic creation
+        # check that all layers have kernels
         assert len(layer_depths) == len(layer_kernel_sizes)
 
-        self.conv = nnx.Sequential(
-            Conv2d(1, 32, kernel_size=(3, 3), rngs=rngs),
-            nnx.Dropout(rate=0.025, rngs=rngs),
-            partial(nnx.avg_pool, window_shape=(2, 2), strides=(2, 2)),
-            Conv2d(32, 64, kernel_size=(3, 3), rngs=rngs),
-            partial(nnx.avg_pool, window_shape=(2, 2), strides=(2, 2)),
-        )
-        self.linear1 = nnx.Linear(3136, 256, rngs=rngs)
-        self.dropout2 = nnx.Dropout(rate=0.025, rngs=rngs)
-        self.linear2 = nnx.Linear(256, 10, rngs=rngs)
+        self.pool = partial(nnx.avg_pool, window_shape=(2, 2), strides=(2, 2))
+
+        # dynamic conv stack creation
+        modules = []
+        in_depth = input_depth
+        current_height, current_width = 28, 28
+        for out_depth, kernel_size in zip(layer_depths, layer_kernel_sizes):
+            modules.append(Conv2d(in_depth, out_depth, kernel_size, rngs=rngs))
+            modules.append(nnx.Dropout(rate=0.025, rngs=rngs))
+            modules.append(self.pool)
+
+            # keep track of sizes
+            in_depth = out_depth
+            current_height //= 2
+            current_width //= 2
+
+        # calc flattened array size (global avg pooling gave bad results)
+        flat_size = current_height * current_width * layer_depths[-1]
+
+        # unpack into sequential
+        self.conv = nnx.Sequential(*modules)
+
+        # classification head
+        self.linear1 = nnx.Linear(flat_size, 256, rngs=rngs)
+        self.dropout = nnx.Dropout(rate=0.025, rngs=rngs)
+        self.linear2 = nnx.Linear(256, num_classes, rngs=rngs)
 
     def __call__(self, x):
         x = self.conv(x)
         x = x.reshape(x.shape[0], -1)  # flatten
-        x = nnx.relu(self.dropout2(self.linear1(x)))
+        x = nnx.relu(self.dropout(self.linear1(x)))
         x = self.linear2(x)
         return x
