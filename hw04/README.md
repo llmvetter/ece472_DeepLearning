@@ -1,0 +1,3 @@
+# hw04
+
+CIFAR 10. CIFAR100.
