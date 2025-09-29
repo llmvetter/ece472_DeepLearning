@@ -3,7 +3,7 @@
 [project]
 name = "hw04"
 version = "0.1.0"
-description = "CIFAR 10. CIFAR100."
+description = "CIFAR10. CIFAR100."
 readme = "README.md"
 authors = [
     { name = "Lennart Vetter.", email = "my@email" }
@@ -17,6 +17,10 @@ dependencies = [
     "jaxlib",
     "flax",
     "colorama",
+    "tensorflow>=2.20.0",
+    "pydantic>=2.11.9",
+    "pydantic-settings>=2.11.0",
+    "tensorflow-datasets>=4.9.9",
 ]
 
 [project.scripts]
