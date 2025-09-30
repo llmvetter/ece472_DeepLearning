@@ -9,6 +9,7 @@ from .data import Data
 from .model import Classifier
 from .training import train
 from .logging import configure_logging
+from .checkpointing import Checkpointer
 
 
 def main() -> None:
@@ -55,9 +56,38 @@ def main() -> None:
         accuracy=nnx.metrics.Accuracy(),
         loss=nnx.metrics.Average("loss"),
     )
-
+    checkpointer = Checkpointer()
     # Train and eval on train and test
-    train(model, optimizer, data, settings.training, metrics)
-
+    train(
+        model=model,
+        optimizer=optimizer,
+        data=data,
+        settings=settings.training,
+        metrics=metrics,
+        checkpointer=checkpointer,
+    )
+    # Attempting to load model
+    log.info("Attempting to Load Model")
+    abstract_model = nnx.eval_shape(
+        lambda: Classifier(
+            input_depth=settings.training.input_depth,
+            num_blocks=(3, 3, 3),
+            layer_depths=settings.training.layer_depths,
+            num_classes=settings.training.num_classes,
+            layer_kernel_sizes=settings.training.layer_kernel_sizes,
+            rngs=nnx.Rngs(0),
+        )
+    )
+    loaded_model = checkpointer.load(
+        abstract_model=abstract_model, model_state=nnx.state(model)
+    )
+    train(
+        model=loaded_model,
+        optimizer=optimizer,
+        data=data,
+        settings=settings.training,
+        metrics=metrics,
+        checkpointer=checkpointer,
+    )
     # Eval model on testset, once
     # test(model, data)

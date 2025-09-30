@@ -24,8 +24,8 @@ class TrainingSettings(BaseModel):
     layer_depths: tuple[int] = (16, 32, 64)
     layer_kernel_sizes: tuple[int] = (3, 3, 3)
     batch_size: int = 32
-    train_steps: int = 100
-    learning_rate: float = 0.0005
+    train_steps: int = 20
+    learning_rate: float = 0.001
     momentum: float = 0.9
 
 

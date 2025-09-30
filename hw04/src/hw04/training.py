@@ -5,6 +5,7 @@ from flax import nnx
 from .model import Classifier
 from .config import TrainingSettings
 from .data import Data
+from .checkpointing import Checkpointer
 
 log = structlog.get_logger()
 
@@ -50,9 +51,9 @@ def train(
     data: Data,
     settings: TrainingSettings,
     metrics: nnx.MultiMetric,
+    checkpointer: Checkpointer,
 ) -> None:
     """Train the model using SGD."""
-
     log.info("Starting training", **settings.model_dump())
 
     for step, batch in enumerate(data.train_ds.as_numpy_iterator()):
@@ -71,6 +72,9 @@ def train(
             for metric, value in metrics.compute().items():
                 log.info(f"eval_{metric}", metric=value)
             metrics.reset()
+
+            checkpointer.dump(model, step)
+            log.info(f"Checkpoint saved successfully at step {step}.")
 
     log.info("Training finished")
 
