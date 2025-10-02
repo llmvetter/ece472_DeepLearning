@@ -8,8 +8,8 @@ class Data:
     def __init__(
         self,
         rng: tf.random.Generator,
-        batch_size: int = 32,
-        train_steps: int = 1000,
+        batch_size: int = 256,
+        train_steps: int = 5000,
         val_split: float = 0.2,
     ) -> None:
         self.train_steps = train_steps
@@ -18,7 +18,17 @@ class Data:
         self._rng = rng
 
     def _preprocess(self, sample):
-        image = tf.cast(sample["image"], tf.float32) / 255.0
+        image = sample["image"]
+        image = tf.cast(image, tf.float32) / 255.0
+
+        # augment
+        image = tf.image.resize_with_crop_or_pad(image, 40, 40)
+        image = tf.image.random_crop(image, [32, 32, 3])
+        image = tf.image.random_flip_left_right(image)
+        image = tf.image.random_brightness(image, max_delta=0.2)
+        image = tf.image.random_contrast(image, 0.8, 1.2)
+        image = tf.image.random_saturation(image, 0.8, 1.2)
+
         return {
             "image": image,
             "label": sample["label"],
@@ -41,13 +51,13 @@ class Data:
         test_ds = test_ds.map(self._preprocess, num_parallel_calls=tf.data.AUTOTUNE)
 
         # prepare (from jax docu)
-        train_ds = train_ds.shuffle(buffer_size=1024, seed=42)
         self.train_ds = (
-            train_ds.batch(
+            train_ds.repeat()
+            .shuffle(buffer_size=10000, reshuffle_each_iteration=True, seed=42)
+            .batch(
                 batch_size=self.batch_size,
                 drop_remainder=True,
             )
-            .take(self.train_steps)
             .prefetch(tf.data.AUTOTUNE)
         )
         self.val_ds = val_ds.batch(
