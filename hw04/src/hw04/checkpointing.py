@@ -3,8 +3,12 @@ from flax import nnx
 
 
 class Checkpointer:
-    def __init__(self):
-        self.dir = ocp.test_utils.erase_and_create_empty("/tmp/checkpoints/cifar10/")
+    def __init__(self, kill=False):
+        self.dir = (
+            ocp.test_utils.erase_and_create_empty("/tmp/checkpoints/cifar10/")
+            if kill
+            else "/tmp/checkpoints/cifar10/"
+        )
 
     def dump(self, model, step):
         model_state = nnx.state(model)

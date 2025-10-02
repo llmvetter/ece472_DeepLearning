@@ -18,14 +18,15 @@ class DataSettings(BaseModel):
 class TrainingSettings(BaseModel):
     """Settings for model training."""
 
+    fresh_start: bool = False
     input_depth: int = 3
     num_classes: int = 10
     num_block: tuple = (3, 3, 3)
     layer_depths: tuple[int] = (16, 32, 64)
     layer_kernel_sizes: tuple[int] = (3, 3, 3)
-    batch_size: int = 32
-    train_steps: int = 20
-    learning_rate: float = 0.001
+    batch_size: int = 512
+    train_steps: int = 5000
+    learning_rate: float = 0.02
     momentum: float = 0.9
 
 

@@ -60,7 +60,7 @@ def train(
         model.train()
         loss = train_step(model, optimizer, batch)
 
-        if step % 10 == 0 and step > 0:
+        if step % 20 == 0 and step > 0:
             log.info(
                 "Training progress",
                 step=step,
@@ -73,8 +73,12 @@ def train(
                 log.info(f"eval_{metric}", metric=value)
             metrics.reset()
 
+        if step % 100 == 0 and step > 0:
             checkpointer.dump(model, step)
             log.info(f"Checkpoint saved successfully at step {step}.")
+
+        if step >= settings.train_steps:
+            break
 
     log.info("Training finished")
 
