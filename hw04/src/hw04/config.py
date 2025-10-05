@@ -13,19 +13,20 @@ class DataSettings(BaseModel):
     """Settings for data generation."""
 
     val_split: float = 0.2
+    dataset: str = "cifar100"
 
 
 class TrainingSettings(BaseModel):
     """Settings for model training."""
 
-    fresh_start: bool = False
+    fresh_start: bool = True
     input_depth: int = 3
-    num_classes: int = 10
-    num_block: tuple = (3, 3, 3)
-    layer_depths: tuple[int] = (16, 32, 64)
+    num_classes: int = 100
+    num_block: tuple = (5, 5, 5)
+    layer_depths: tuple[int] = (64, 128, 256)
     layer_kernel_sizes: tuple[int] = (3, 3, 3)
-    batch_size: int = 512
-    train_steps: int = 5000
+    batch_size: int = 256
+    train_steps: int = 2000
     learning_rate: float = 0.02
     momentum: float = 0.9
 
