@@ -1,6 +1,7 @@
 import optax
 import structlog
 from flax import nnx
+import jax.numpy as jnp
 
 from .model import Classifier
 from .config import TrainingSettings
@@ -35,8 +36,15 @@ def train_step(
 @nnx.jit
 def eval_step(model: Classifier, metrics: nnx.MultiMetric, batch):
     logits = model(batch["image"])
+    labels = batch["label"]
     loss = loss_fn(model, batch)
-    metrics.update(loss=loss, logits=logits, labels=batch["label"])
+    top_5 = top_5_accuracy(logits=logits, labels=labels)
+    metrics.update(
+        loss=loss,
+        logits=logits,
+        labels=labels,
+        top_5_acc=top_5,
+    )
 
 
 @nnx.jit
@@ -98,3 +106,13 @@ def test(
     accuracy = correct / total
     log.info(f"Trained Model evaluated on {total} samples")
     log.info(f"Test accuracy: {accuracy:.4f}")
+
+
+def top_5_accuracy(
+    logits: jnp.ndarray,
+    labels: jnp.ndarray,
+) -> jnp.ndarray:
+    idxs = jnp.argsort(logits, axis=-1)[:, -5:]
+    labels_exp = jnp.expand_dims(labels, axis=-1)
+    hits = jnp.any(idxs == labels_exp, axis=-1)
+    return jnp.mean(hits.astype(jnp.float32))

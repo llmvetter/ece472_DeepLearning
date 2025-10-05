@@ -8,14 +8,16 @@ class Data:
     def __init__(
         self,
         rng: tf.random.Generator,
+        dataset: str = "cifar10",
         batch_size: int = 256,
         train_steps: int = 5000,
         val_split: float = 0.2,
     ) -> None:
+        self._rng = rng
+        self.dataset = dataset
         self.train_steps = train_steps
         self.batch_size = batch_size
         self.split = int((1 - val_split) * 100)
-        self._rng = rng
 
     def _preprocess(self, sample):
         image = sample["image"]
@@ -28,6 +30,7 @@ class Data:
         image = tf.image.random_brightness(image, max_delta=0.2)
         image = tf.image.random_contrast(image, 0.8, 1.2)
         image = tf.image.random_saturation(image, 0.8, 1.2)
+        image = tf.image.random_hue(image, max_delta=0.08)
 
         return {
             "image": image,
@@ -37,7 +40,7 @@ class Data:
     def load(self) -> None:
         # load
         train_ds, val_ds, test_ds = tfds.load(
-            "cifar10",
+            self.dataset,
             split=[
                 f"train[:{self.split}%]",
                 f"train[{self.split}%:]",
