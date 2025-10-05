@@ -1,5 +1,6 @@
 import jax
 import jax.numpy as jnp
+import numpy as np
 from flax import nnx
 
 
@@ -162,3 +163,9 @@ class Classifier(nnx.Module):
         z = self.dropout(z)
         z = self.linear(z)
         return z
+
+
+def count_params(model: Classifier) -> int:
+    params = nnx.state(model, nnx.Param)
+    total_params = sum(np.prod(x.shape) for x in jax.tree_util.tree_leaves(params))
+    return int(total_params)

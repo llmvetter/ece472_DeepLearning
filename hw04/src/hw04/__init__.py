@@ -6,7 +6,7 @@ from flax import nnx
 
 from .config import load_settings
 from .data import Data
-from .model import Classifier
+from .model import Classifier, count_params
 from .training import train
 from .logging import configure_logging
 from .checkpointing import Checkpointer
@@ -28,11 +28,13 @@ def main() -> None:
     log.debug("Generating Data")
     data = Data(
         rng=tf_rng,
+        dataset=settings.data.dataset,
         val_split=settings.data.val_split,
         batch_size=settings.training.batch_size,
         train_steps=settings.training.train_steps,
     )
     data.load()
+    log.info("Loaded and preprocessed dataset", dataset=settings.data.dataset)
 
     # model
     model = Classifier(
@@ -45,6 +47,7 @@ def main() -> None:
     )
 
     log.debug("Initial model", model=model)
+    log.info("Total trainable parameters", n_params=count_params(model))
 
     # optimizer with exonential decay schedule
     optimizer = nnx.Optimizer(
@@ -63,11 +66,12 @@ def main() -> None:
     # metrics
     metrics = nnx.MultiMetric(
         accuracy=nnx.metrics.Accuracy(),
+        top_5_acc=nnx.metrics.Average("top_5_acc"),
         loss=nnx.metrics.Average("loss"),
     )
 
     # checkpointer
-    if settings.training.fresh_start is not False:
+    if settings.training.fresh_start is False:
         checkpointer = Checkpointer(kill=False)
 
         # attempting to load model
