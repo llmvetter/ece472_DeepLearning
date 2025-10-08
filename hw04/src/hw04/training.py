@@ -91,23 +91,6 @@ def train(
     log.info("Training finished")
 
 
-def test(
-    model: Classifier,
-    data: Data,
-):
-    log.info("Starting Evaluation")
-    correct = 0
-    total = 0
-    for batch in data.test_ds.as_numpy_iterator():
-        predictions = pred_step(model, batch)
-        correct_pred = (predictions == batch["label"]).sum()
-        correct += correct_pred
-        total += len(batch["label"])
-    accuracy = correct / total
-    log.info(f"Trained Model evaluated on {total} samples")
-    log.info(f"Test accuracy: {accuracy:.4f}")
-
-
 def top_5_accuracy(
     logits: jnp.ndarray,
     labels: jnp.ndarray,
@@ -116,3 +99,34 @@ def top_5_accuracy(
     labels_exp = jnp.expand_dims(labels, axis=-1)
     hits = jnp.any(idxs == labels_exp, axis=-1)
     return jnp.mean(hits.astype(jnp.float32))
+
+
+def test_top5(
+    model: Classifier,
+    data: Data,
+):
+    log.info("Starting Evaluation")
+    correct_top1 = 0
+    correct_top5 = 0
+    total = 0
+
+    model.eval()
+
+    for batch in data.test_ds.as_numpy_iterator():
+        logits = model(batch["image"])
+        labels = batch["label"]
+        batch_size = len(labels)
+        predictions_top1 = jnp.argmax(logits, axis=-1)
+        correct_top1_pred = (predictions_top1 == labels).sum()
+        correct_top1 += correct_top1_pred
+        top_5_batch_acc = top_5_accuracy(logits=logits, labels=labels)
+        correct_top5_hits = int(top_5_batch_acc * batch_size)
+        correct_top5 += correct_top5_hits
+        total += batch_size
+
+    accuracy_top1 = correct_top1 / total
+    accuracy_top5 = correct_top5 / total
+
+    log.info(f"Trained Model evaluated on {total} samples")
+    log.info(f"Test Top-1 accuracy: {accuracy_top1:.4f}")
+    log.info(f"Test Top-5 accuracy: {accuracy_top5:.4f}")

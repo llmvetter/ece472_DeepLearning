@@ -86,18 +86,18 @@ class ResidualBlock(nnx.Module):
                 d_in=d_in,
                 d_out=d_out,
                 kernel_size=(1, 1),
-                strides=(2, 2),
+                strides=(2, 2) if self.subsample else (1, 1),
                 rngs=rngs,
             )
 
     def __call__(self, x: jax.Array) -> jax.Array:
+        identity = self.downsample(x) if self.subsample else x
         z = self.norm1(x)
         z = self.act(z)
         z = self.conv1(z)
         z = self.norm2(z)
         z = self.act(z)
         z = self.conv2(z)
-        identity = self.downsample(x) if self.subsample else x
         return z + identity
 
 

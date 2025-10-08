@@ -7,7 +7,7 @@ from flax import nnx
 from .config import load_settings
 from .data import Data
 from .model import Classifier, count_params
-from .training import train
+from .training import train, test_top5
 from .logging import configure_logging
 from .checkpointing import Checkpointer
 
@@ -104,4 +104,4 @@ def main() -> None:
         checkpointer=checkpointer,
     )
     # Eval model on testset, once
-    # test(model, data)
+    test_top5(model, data)
