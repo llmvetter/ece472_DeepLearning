@@ -1,0 +1,31 @@
+[project]
+name = "hw05"
+version = "0.1.0"
+description = "AG News Classification."
+readme = "README.md"
+authors = [
+    { name = "Lennart Vetter", email = "my@email" }
+]
+requires-python = ">=3.11,<3.13"
+
+dependencies = [
+    "structlog",
+    "rich",
+    "numpy>=1.22,<2.0",
+    "jax[cpu]>=0.4.0,<0.7.0",
+    "jaxlib>=0.4.0,<0.7.0",
+    "flax>=0.6.0",
+    "pydantic>=2.11.9",
+    "pydantic-settings>=2.11.0",
+    "colorama",
+    "tensorflow-datasets>=4.9.9",
+    "tensorflow>=2.20.0",
+    "gensim>=4.3.3",
+]
+
+[project.scripts]
+hw05 = "hw05:main"
+
+[build-system]
+requires = ["uv_build>=0.8.3,<0.9.0"]
+build-backend = "uv_build"
