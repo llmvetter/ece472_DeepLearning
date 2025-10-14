@@ -3,6 +3,7 @@ import jax.numpy as jnp
 import numpy as np
 from flax import nnx
 import gensim.downloader as api
+from gensim.utils import simple_preprocess
 
 
 class Embedder:
@@ -11,6 +12,9 @@ class Embedder:
         self.vector_size = self.glove_model.vector_size
         self.word_to_index = {"<PAD>": 0}
         self.max_words = 50
+
+    def tokenize(self, sequence: str) -> list[str]:
+        return simple_preprocess(sequence)
 
     def build_embedding_matrix(self, tokens: list[str]):
         # build mapping word -> idx

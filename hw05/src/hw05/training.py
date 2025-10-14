@@ -3,7 +3,6 @@ import structlog
 from flax import nnx
 
 from .config import TrainingSettings
-from .data import Data
 from .model import MLP
 
 log = structlog.get_logger()
@@ -43,30 +42,33 @@ def eval_step(model: MLP, metrics: nnx.MultiMetric, batch):
 def train(
     model: MLP,
     optimizer: nnx.Optimizer,
-    data: Data,
+    train_ds,
+    eval_ds,
     settings: TrainingSettings,
     metrics: nnx.MultiMetric,
-) -> None:
+) -> float:
     """Train the model using SGD."""
 
-    log.info("Starting training", **settings.model_dump())
+    log.info("Starting training on new Fold.", **settings.model_dump())
 
-    for step, batch in enumerate(data.train_ds.as_numpy_iterator()):
+    for step, batch in enumerate(train_ds.as_numpy_iterator()):
         model.train()
         loss = train_step(model, optimizer, batch)
 
-        if step % 50 == 0 and step > 0:
+        if step % 10 == 0 and step > 0:
             log.info(
                 "Training progress",
                 step=step,
                 training_loss=float(loss),
             )
-        if step % 100 == 0 and step > 0:
-            model.eval()
-            for eval_batch in data.val_ds.as_numpy_iterator():
-                eval_step(model, metrics, eval_batch)
-            for metric, value in metrics.compute().items():
-                log.info(f"eval_{metric}", metric=value)
-            metrics.reset()
 
-    log.info("Training finished")
+    model.eval()
+    for eval_batch in eval_ds.as_numpy_iterator():
+        eval_step(model, metrics, eval_batch)
+    metric_values = metrics.compute()
+    for metric, value in metric_values.items():
+        log.info(f"eval_{metric}", metric=value)
+    accuracy = metric_values.get("accuracy")
+    metrics.reset()
+    log.info("Fold Finished.")
+    return accuracy

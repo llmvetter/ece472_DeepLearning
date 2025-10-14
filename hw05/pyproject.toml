@@ -21,6 +21,7 @@ dependencies = [
     "tensorflow-datasets>=4.9.9",
     "tensorflow>=2.20.0",
     "gensim>=4.3.3",
+    "scikit-learn>=1.7.2",
 ]
 
 [project.scripts]

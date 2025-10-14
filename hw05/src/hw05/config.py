@@ -19,8 +19,8 @@ class TrainingSettings(BaseModel):
     """Settings for model training."""
 
     vector_dim: int = 25
-    layer_width: int = 100
-    layer_depth: int = 8
+    layer_width: int = 200
+    layer_depth: int = 10
     num_outputs: int = 4
     batch_size: int = 512
     learning_rate: float = 0.0005
