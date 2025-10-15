@@ -8,7 +8,7 @@ from .config import load_settings
 from .data import Data
 from .model import MLP
 from .model import Embedder
-from .training import train
+from .training import train, test
 from .logging import configure_logging
 
 
@@ -21,25 +21,29 @@ def main() -> None:
 
     # JAX PRNG
     key = jax.random.PRNGKey(settings.random_seed)
-    data_key, model_key = jax.random.split(key)
 
+    # Load and preprocess data
     log.debug("Generating Data")
     embedder = Embedder()
     data = Data(
         embedder,
+        n_splits=settings.data.folds,
     )
     data.load()
 
+    # start k-fold training
     log.info("Starting training", **settings.model_dump())
     accs = []
     for idx, train_ds, eval_ds in data.kfolds():
+        log.info(f"Starting training on fold: {idx}")
+
         model = MLP(
             num_inputs=settings.training.vector_dim,
             layer_width=settings.training.layer_width,
             layer_depth=settings.training.layer_depth,
             num_outputs=settings.training.num_outputs,
             output_activation=nnx.identity,
-            rngs=nnx.Rngs(params=model_key),
+            rngs=nnx.Rngs(params=key),
         )
 
         log.debug("Initial model", model=model)
@@ -62,22 +66,14 @@ def main() -> None:
             optimizer=optimizer,
             train_ds=train_ds,
             eval_ds=eval_ds,
-            settings=settings.training,
             metrics=metrics,
         )
         accs.append(acc)
+
     avg_accuracy = np.mean(accs)
     std_accuracy = np.std(accs)
     log.info(
         f"Average Accuracy across {data.splits} folds: {avg_accuracy:.4f} ± {std_accuracy:.4f}"
     )
 
-    # sanity check, should be label 0
-    article = (
-        "‘A Big Day’: How the U.S. and the Arab World Teamed Up to Seal the Gaza Deal"
-    )
-    tokens = embedder.tokenize(article)
-    embedding = embedder([tokens])
-    prediction = model(embedding)
-    prediction = jax.nn.softmax(prediction)
-    log.info("Label", labels=prediction)
+    test(model=model, metrics=metrics, ds=data.test_ds)

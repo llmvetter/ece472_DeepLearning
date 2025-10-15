@@ -13,7 +13,6 @@ class Data:
         self,
         embedder: Embedder,
         batch_size: int = 126,
-        val_split: float = 0.1,
         n_splits: int = 5,
     ) -> None:
         self.batch_size = batch_size

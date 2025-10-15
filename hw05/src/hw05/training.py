@@ -2,7 +2,6 @@ import optax
 import structlog
 from flax import nnx
 
-from .config import TrainingSettings
 from .model import MLP
 
 log = structlog.get_logger()
@@ -39,35 +38,42 @@ def eval_step(model: MLP, metrics: nnx.MultiMetric, batch):
     metrics.update(loss=loss, logits=logits, labels=batch["label"])
 
 
+def test(model: MLP, metrics: nnx.MultiMetric, ds):
+    model.eval()
+    for eval_batch in ds.as_numpy_iterator():
+        eval_step(model, metrics, eval_batch)
+    accuracy = metrics.compute().get("accuracy")
+    log.info("Final Test Accuracy", metric=accuracy)
+
+
 def train(
     model: MLP,
     optimizer: nnx.Optimizer,
     train_ds,
     eval_ds,
-    settings: TrainingSettings,
     metrics: nnx.MultiMetric,
 ) -> float:
     """Train the model using SGD."""
-
-    log.info("Starting training on new Fold.", **settings.model_dump())
 
     for step, batch in enumerate(train_ds.as_numpy_iterator()):
         model.train()
         loss = train_step(model, optimizer, batch)
 
-        if step % 10 == 0 and step > 0:
+        if step % 100 == 0 and step > 0:
             log.info(
                 "Training progress",
                 step=step,
                 training_loss=float(loss),
             )
-
+    # eval model per fold
     model.eval()
     for eval_batch in eval_ds.as_numpy_iterator():
         eval_step(model, metrics, eval_batch)
     metric_values = metrics.compute()
     for metric, value in metric_values.items():
         log.info(f"eval_{metric}", metric=value)
+
+    # collect fold accuracy
     accuracy = metric_values.get("accuracy")
     metrics.reset()
     log.info("Fold Finished.")

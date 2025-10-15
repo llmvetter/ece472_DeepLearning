@@ -12,7 +12,7 @@ from pydantic_settings import (
 class DataSettings(BaseModel):
     """Settings for data generation."""
 
-    val_split: float = 0.2
+    folds: int = 5
 
 
 class TrainingSettings(BaseModel):
@@ -20,10 +20,10 @@ class TrainingSettings(BaseModel):
 
     vector_dim: int = 25
     layer_width: int = 200
-    layer_depth: int = 10
+    layer_depth: int = 5
     num_outputs: int = 4
     batch_size: int = 512
-    learning_rate: float = 0.0005
+    learning_rate: float = 0.001
     momentum: float = 0.9
 
 
