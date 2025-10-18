@@ -13,6 +13,7 @@ class DataSettings(BaseModel):
     """Settings for data generation."""
 
     folds: int = 5
+    max_words: int = 50
 
 
 class TrainingSettings(BaseModel):

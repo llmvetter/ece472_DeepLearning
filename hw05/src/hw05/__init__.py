@@ -24,7 +24,7 @@ def main() -> None:
 
     # Load and preprocess data
     log.debug("Generating Data")
-    embedder = Embedder()
+    embedder = Embedder(max_words=settings.data.max_words)
     data = Data(
         embedder,
         n_splits=settings.data.folds,

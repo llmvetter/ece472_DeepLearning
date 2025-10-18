@@ -7,11 +7,11 @@ from gensim.utils import simple_preprocess
 
 
 class Embedder:
-    def __init__(self):
+    def __init__(self, max_words: int = 50):
         self.glove_model = api.load("glove-twitter-25")
         self.vector_size = self.glove_model.vector_size
         self.word_to_index = {"<PAD>": 0}
-        self.max_words = 50
+        self.max_words = max_words
 
     def tokenize(self, sequence: str) -> list[str]:
         return simple_preprocess(sequence)
@@ -44,7 +44,6 @@ class Embedder:
     def __call__(self, sequence: list[list[str]]) -> jnp.ndarray:
         indexed_array = jnp.array(self._index(sequence), dtype=jnp.int32)
         document_vectors = self.embedding_matrix[indexed_array]
-        # revisit and fix masking cause of padding
         return jnp.mean(document_vectors, axis=1)
 
 
