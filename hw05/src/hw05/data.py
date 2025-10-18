@@ -41,7 +41,11 @@ class Data:
             }
         )
         if reshuffle is True:
-            ds = ds.shuffle(buffer_size=10000, reshuffle_each_iteration=True, seed=42)
+            ds = ds.shuffle(
+                buffer_size=10000,
+                reshuffle_each_iteration=True,
+                seed=42,
+            )
 
         ds = ds.batch(
             batch_size=self.batch_size,
