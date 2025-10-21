@@ -18,7 +18,7 @@ class Data:
         self.context_length = context_length
         self.batch_size = batch_size
         self.split = float(1 - val_split)
-        self.file_path = "/home/lenni/projects/deepl/hw06/data/input.txt"
+        self.file_path = "/content/ece472_DeepLearning/data/input.txt"
 
     def load(self) -> None:
         # load
