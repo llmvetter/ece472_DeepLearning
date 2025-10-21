@@ -15,9 +15,9 @@ class TrainingSettings(BaseModel):
     n_embed: int = 32
     vocab_size: int = 100
     n_blocks: int = 5
-    block_size: int = 8
+    context_length: int = 8
     n_heads: int = 4
-    batch_size: int = 256
+    batch_size: int = 16
     train_steps: int = 10
     learning_rate: float = 0.02
     momentum: float = 0.9

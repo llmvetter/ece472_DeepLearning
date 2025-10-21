@@ -25,22 +25,25 @@ class FeedForward(nnx.Module):
 
 
 class Head(nnx.Module):
-    def __init__(self, head_size: int, rngs: nnx.Rngs):
+    def __init__(self, n_embed: int, head_size: int, rngs: nnx.Rngs):
+        self.head_size = head_size
+        self.n_embed = n_embed
+
         self.K = nnx.Linear(
-            in_features=head_size,
-            out_features=head_size,
+            in_features=self.n_embed,
+            out_features=self.head_size,
             use_bias=False,
             rngs=rngs,
         )
         self.Q = nnx.Linear(
-            in_features=head_size,
-            out_features=head_size,
+            in_features=self.n_embed,
+            out_features=self.head_size,
             use_bias=False,
             rngs=rngs,
         )
         self.V = nnx.Linear(
-            in_features=head_size,
-            out_features=head_size,
+            in_features=self.n_embed,
+            out_features=self.head_size,
             use_bias=False,
             rngs=rngs,
         )
@@ -52,9 +55,9 @@ class Head(nnx.Module):
         value = self.V(x)  # B, T, head_size
 
         weights = query @ key.transpose((0, -1, -2)) * self.head_size**-0.5  # B, T, T
-        tril = jnp.tril(jnp.ones(shape=(T, T), dtype=bool))
-        tril - jnp.broadcast_to(tril, (B, T))  # extend mask to batch dimension
-        weights = jnp.where(tril, weights, -jnp.inf)
+        tril = jnp.tril(jnp.ones(shape=(T, T), dtype=bool))  # T, T
+        tril = jnp.expand_dims(tril, axis=0)  # extend mask 1, T, T
+        weights = jnp.where(tril, weights, -jnp.inf)  # B, T, T
         weights = nnx.softmax(weights, axis=-1)
         out = weights @ value
         return out
@@ -68,7 +71,14 @@ class MultiHeadAttention(nnx.Module):
         n_embed: int,
         rngs: nnx.Rngs,
     ) -> None:
-        self.heads = nnx.List(Head(head_size, rngs) for _ in range(n_heads))
+        self.heads = nnx.List(
+            Head(
+                head_size=head_size,
+                n_embed=n_embed,
+                rngs=rngs,
+            )
+            for _ in range(n_heads)
+        )
         self.proj = nnx.Linear(
             in_features=n_embed,
             out_features=n_embed,
@@ -105,7 +115,7 @@ class Decoder(nnx.Module):
         vocab_size: int,
         n_embed: int,
         n_blocks: int,
-        block_size: int,
+        context_length: int,
         n_heads: int,
         rngs: nnx.Rngs,
     ) -> None:
@@ -115,7 +125,7 @@ class Decoder(nnx.Module):
             rngs=rngs,
         )
         self.position_embed_table = nnx.Embed(
-            num_embeddings=block_size,
+            num_embeddings=context_length,
             features=n_embed,
             rngs=rngs,
         )
@@ -130,8 +140,8 @@ class Decoder(nnx.Module):
 
     def __call__(self, idx_sequence: list[int]) -> jnp.ndarray:
         B, T = idx_sequence.shape
-        token_embeds = self.token_embedding_table[idx_sequence]
-        pos_embeds = self.position_embed_table[jnp.arange(T)]
+        token_embeds = self.token_embedding_table(idx_sequence)
+        pos_embeds = self.position_embed_table(jnp.arange(T))
         emb = token_embeds + pos_embeds
         x = self.blocks(emb)
         out = self.linear(x)
