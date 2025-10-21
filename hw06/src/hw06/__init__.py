@@ -40,7 +40,7 @@ def main() -> None:
     )
     log.info("Total trainable parameters", n_params=count_params(decoder))
 
-    # Dummy input: B,T,C = 16, 8, 32
+    # Dummy input: B,T,C = 16, 32, 64
     x_dummy = jnp.ones(
         (
             settings.training.batch_size,
@@ -56,23 +56,25 @@ def main() -> None:
     test_out = x_dummy.shape == output.shape
 
     log.info("Feed Forward Output shape matches input shape", test=test_out)
-
+    head_size = settings.training.n_embed // settings.training.n_heads
     ## Test Attention Head
     att_head = Head(
-        head_size=settings.training.context_length,
+        head_size=head_size,
         n_embed=settings.training.n_embed,
         rngs=nnx.Rngs(params=model_key),
     )
     output = att_head(x_dummy)
-    test_out = output.shape == (B, T, T)
+    test_out = output.shape == (B, T, head_size)
 
     log.info("Attention Matrix retruns Shape", shape=output.shape)
-    log.info("Attention Output shape matches expectation B, T, T", test=test_out)
+    log.info(
+        "Attention Output shape matches expectation B, T, head_size", test=test_out
+    )
 
     ## Test Multi Head Attention
     mh_att = MultiHeadAttention(
         n_heads=settings.training.n_heads,
-        head_size=settings.training.context_length,
+        head_size=head_size,
         n_embed=settings.training.n_embed,
         rngs=nnx.Rngs(params=model_key),
     )
@@ -93,7 +95,14 @@ def main() -> None:
 
     ## Test Decoder
     idx_sequence = jax.random.randint(
-        model_key, shape=(16, 8), minval=1, maxval=101, dtype=jnp.int32
+        model_key,
+        shape=(
+            settings.training.batch_size,
+            settings.training.context_length,
+        ),
+        minval=1,
+        maxval=101,
+        dtype=jnp.int32,
     )
     decoder = Decoder(
         vocab_size=settings.training.vocab_size,
@@ -136,5 +145,5 @@ def main() -> None:
     train(decoder, optimizer, data, settings.training)
 
     # Generate better output
-    out = data.decode(decoder.generate(context, 20)[0].tolist())
+    out = data.decode(decoder.generate(context, 50)[0].tolist())
     log.info("Trained model generated text", text=out)
