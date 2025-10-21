@@ -14,6 +14,7 @@ from .model import (
     Block,
     count_params,
 )
+from .data import Data
 
 
 def main() -> None:
@@ -25,6 +26,7 @@ def main() -> None:
 
     # JAX PRNG
     key = jax.random.PRNGKey(settings.random_seed)
+    data_key, model_key = jax.random.split(key)
 
     decoder = Decoder(
         vocab_size=settings.training.vocab_size,
@@ -32,7 +34,7 @@ def main() -> None:
         n_blocks=settings.training.n_blocks,
         context_length=settings.training.context_length,
         n_heads=settings.training.n_heads,
-        rngs=nnx.Rngs(params=key),
+        rngs=nnx.Rngs(params=model_key),
     )
     log.info("Total trainable parameters", n_params=count_params(decoder))
 
@@ -57,7 +59,7 @@ def main() -> None:
     att_head = Head(
         head_size=settings.training.context_length,
         n_embed=settings.training.n_embed,
-        rngs=nnx.Rngs(params=key),
+        rngs=nnx.Rngs(params=model_key),
     )
     output = att_head(x_dummy)
     test_out = output.shape == (B, T, T)
@@ -70,7 +72,7 @@ def main() -> None:
         n_heads=settings.training.n_heads,
         head_size=settings.training.context_length,
         n_embed=settings.training.n_embed,
-        rngs=nnx.Rngs(params=key),
+        rngs=nnx.Rngs(params=model_key),
     )
     output = mh_att(x_dummy)
     test_out = x_dummy.shape == output.shape
@@ -81,7 +83,7 @@ def main() -> None:
     block = Block(
         n_embed=settings.training.n_embed,
         n_heads=settings.training.n_heads,
-        rngs=nnx.Rngs(params=key),
+        rngs=nnx.Rngs(params=model_key),
     )
     output = block(x_dummy)
     test_out = x_dummy.shape == output.shape
@@ -89,7 +91,7 @@ def main() -> None:
 
     ## Test Decoder
     idx_sequence = jax.random.randint(
-        key, shape=(16, 8), minval=1, maxval=101, dtype=jnp.int32
+        model_key, shape=(16, 8), minval=1, maxval=101, dtype=jnp.int32
     )
     decoder = Decoder(
         vocab_size=settings.training.vocab_size,
@@ -97,7 +99,22 @@ def main() -> None:
         n_blocks=settings.training.n_blocks,
         context_length=settings.training.context_length,
         n_heads=settings.training.n_heads,
-        rngs=nnx.Rngs(params=key),
+        rngs=nnx.Rngs(params=model_key),
     )
     output = decoder(idx_sequence)
     log.info("Decoder Output shape", shape=output.shape)
+
+    data = Data(
+        key=data_key,
+        batch_size=settings.training.batch_size,
+        val_split=settings.training.split,
+    )
+    data.load()
+    data.preprocess()
+    log.info("Vocab Loaded", chars=data.chars)
+    log.info("Dataset Loaded", data=len(data.data))
+    log.info("Train dataset", test=len(data.train_idxs))
+    log.info("Eval dataset", val=len(data.val_idxs))
+
+    x, y = data.get_batch("train")
+    log.info("Sample batch", x_y=(x, y))

@@ -12,6 +12,7 @@ from pydantic_settings import (
 class TrainingSettings(BaseModel):
     """Settings for model training."""
 
+    split: float = 0.1
     n_embed: int = 32
     vocab_size: int = 100
     n_blocks: int = 5
