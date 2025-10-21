@@ -2,6 +2,7 @@ import structlog
 import jax
 from flax import nnx
 import jax.numpy as jnp
+import optax
 
 
 from .logging import configure_logging
@@ -15,6 +16,7 @@ from .model import (
     count_params,
 )
 from .data import Data
+from .training import train
 
 
 def main() -> None:
@@ -104,6 +106,7 @@ def main() -> None:
     output = decoder(idx_sequence)
     log.info("Decoder Output shape", shape=output.shape)
 
+    ## Test Data Loading
     data = Data(
         key=data_key,
         batch_size=settings.training.batch_size,
@@ -111,10 +114,27 @@ def main() -> None:
     )
     data.load()
     data.preprocess()
-    log.info("Vocab Loaded", chars=data.chars)
+    log.info("Vocab Loaded", chars=len(data.chars))
     log.info("Dataset Loaded", data=len(data.data))
     log.info("Train dataset", test=len(data.train_idxs))
     log.info("Eval dataset", val=len(data.val_idxs))
 
-    x, y = data.get_batch("train")
-    log.info("Sample batch", x_y=(x, y))
+    optimizer = nnx.Optimizer(
+        decoder,
+        optax.adam(
+            settings.training.learning_rate,
+            settings.training.momentum,
+        ),
+        wrt=nnx.Param,
+    )
+    # Generate some random output
+    context = jnp.zeros(shape=(1, 1), dtype=jnp.int32)
+    out = data.decode(decoder.generate(context, 10)[0].tolist())
+    log.info("Random model generated text", text=out)
+
+    # Train and eval on train
+    train(decoder, optimizer, data, settings.training)
+
+    # Generate better output
+    out = data.decode(decoder.generate(context, 20)[0].tolist())
+    log.info("Trained model generated text", text=out)

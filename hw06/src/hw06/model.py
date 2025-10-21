@@ -119,6 +119,7 @@ class Decoder(nnx.Module):
         n_heads: int,
         rngs: nnx.Rngs,
     ) -> None:
+        self.rngs = rngs
         self.token_embedding_table = nnx.Embed(
             num_embeddings=vocab_size,
             features=n_embed,
@@ -138,7 +139,7 @@ class Decoder(nnx.Module):
             rngs=rngs,
         )
 
-    def __call__(self, idx_sequence: list[int]) -> jnp.ndarray:
+    def __call__(self, idx_sequence: jnp.ndarray) -> jnp.ndarray:
         B, T = idx_sequence.shape
         token_embeds = self.token_embedding_table(idx_sequence)
         pos_embeds = self.position_embed_table(jnp.arange(T))
@@ -146,6 +147,23 @@ class Decoder(nnx.Module):
         x = self.blocks(emb)
         out = self.linear(x)
         return out
+
+    def generate(self, idx: jnp.ndarray, max_new_tokens: int):
+        for _ in range(max_new_tokens):
+            logits = self(idx)
+            logits = logits[:, -1, :]
+            probs = jax.nn.softmax(logits)
+            idx_next = jnp.argmax(
+                jax.random.multinomial(
+                    key=self.rngs.params(),
+                    n=1,
+                    p=probs,
+                ),
+                axis=1,
+            )
+            idx_next = jnp.expand_dims(idx_next, axis=1)
+            idx = jnp.concatenate((idx, idx_next), axis=1)
+        return idx
 
 
 def count_params(model: nnx.Module) -> int:
