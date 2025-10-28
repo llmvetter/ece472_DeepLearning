@@ -13,12 +13,12 @@ class TrainingSettings(BaseModel):
     """Settings for model training."""
 
     split: float = 0.1
-    batch_size: int = 16
+    batch_size: int = 32
     vocab_size: int = 65
-    n_embed: int = 64
-    context_length: int = 32
-    n_heads: int = 4
-    n_blocks: int = 8
+    n_embed: int = 128
+    context_length: int = 64
+    n_heads: int = 8
+    n_blocks: int = 20
     train_steps: int = 1000
     learning_rate: float = 0.0001
     momentum: float = 0.9

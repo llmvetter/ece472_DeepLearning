@@ -18,6 +18,7 @@ class FeedForward(nnx.Module):
                 out_features=n_emb,
                 rngs=rngs,
             ),
+            nnx.Dropout(rate=0.2, rngs=rngs),
         )
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
@@ -47,6 +48,7 @@ class Head(nnx.Module):
             use_bias=False,
             rngs=rngs,
         )
+        self.dropout = nnx.Dropout(rate=0.2, rngs=rngs)
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
         B, T, C = x.shape
@@ -59,6 +61,7 @@ class Head(nnx.Module):
         tril = jnp.expand_dims(tril, axis=0)  # extend mask 1, T, T
         weights = jnp.where(tril, weights, -jnp.inf)  # B, T, T
         weights = nnx.softmax(weights, axis=-1)
+        weights = self.dropout(weights)
         out = weights @ value
         return out
 
@@ -84,10 +87,12 @@ class MultiHeadAttention(nnx.Module):
             out_features=n_embed,
             rngs=rngs,
         )
+        self.dropout = nnx.Dropout(rate=0.2, rngs=rngs)
 
     def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
         x = jnp.concatenate([h(x) for h in self.heads], axis=-1)
-        return self.proj(x)
+        x = self.dropout(self.proj(x))
+        return x
 
 
 class Block(nnx.Module):

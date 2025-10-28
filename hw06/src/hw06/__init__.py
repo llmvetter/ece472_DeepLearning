@@ -27,18 +27,9 @@ def main() -> None:
     log.info("Settings loaded", settings=settings.model_dump())
 
     # JAX PRNG
-    key = jax.random.PRNGKey(settings.random_seed)
-    data_key, model_key = jax.random.split(key)
 
-    decoder = Decoder(
-        vocab_size=settings.training.vocab_size,
-        n_embed=settings.training.n_embed,
-        n_blocks=settings.training.n_blocks,
-        context_length=settings.training.context_length,
-        n_heads=settings.training.n_heads,
-        rngs=nnx.Rngs(params=model_key),
-    )
-    log.info("Total trainable parameters", n_params=count_params(decoder))
+    key = jax.random.PRNGKey(settings.random_seed)
+    data_key, model_key, dropout_key = jax.random.split(key, num=3)
 
     # Dummy input: B,T,C = 16, 32, 64
     x_dummy = jnp.ones(
@@ -51,7 +42,10 @@ def main() -> None:
     B, T, C = x_dummy.shape
 
     ## Test Feed Forward
-    ffw = FeedForward(n_emb=settings.training.n_embed, rngs=nnx.Rngs(params=key))
+    ffw = FeedForward(
+        n_emb=settings.training.n_embed,
+        rngs=nnx.Rngs(params=model_key, dropout=dropout_key),
+    )
     output = ffw(x_dummy)
     test_out = x_dummy.shape == output.shape
 
@@ -61,7 +55,7 @@ def main() -> None:
     att_head = Head(
         head_size=head_size,
         n_embed=settings.training.n_embed,
-        rngs=nnx.Rngs(params=model_key),
+        rngs=nnx.Rngs(params=model_key, dropout=dropout_key),
     )
     output = att_head(x_dummy)
     test_out = output.shape == (B, T, head_size)
@@ -76,7 +70,7 @@ def main() -> None:
         n_heads=settings.training.n_heads,
         head_size=head_size,
         n_embed=settings.training.n_embed,
-        rngs=nnx.Rngs(params=model_key),
+        rngs=nnx.Rngs(params=model_key, dropout=dropout_key),
     )
     output = mh_att(x_dummy)
     test_out = x_dummy.shape == output.shape
@@ -87,7 +81,7 @@ def main() -> None:
     block = Block(
         n_embed=settings.training.n_embed,
         n_heads=settings.training.n_heads,
-        rngs=nnx.Rngs(params=model_key),
+        rngs=nnx.Rngs(params=model_key, dropout=dropout_key),
     )
     output = block(x_dummy)
     test_out = x_dummy.shape == output.shape
@@ -110,10 +104,11 @@ def main() -> None:
         n_blocks=settings.training.n_blocks,
         context_length=settings.training.context_length,
         n_heads=settings.training.n_heads,
-        rngs=nnx.Rngs(params=model_key),
+        rngs=nnx.Rngs(params=model_key, dropout=dropout_key),
     )
     output = decoder(idx_sequence)
     log.info("Decoder Output shape", shape=output.shape)
+    log.info("Total trainable parameters", n_params=count_params(decoder))
 
     ## Test Data Loading
     data = Data(
@@ -137,13 +132,16 @@ def main() -> None:
         wrt=nnx.Param,
     )
     # Generate some random output
+    decoder.eval()
     context = jnp.zeros(shape=(1, 1), dtype=jnp.int32)
     out = data.decode(decoder.generate(context, 10)[0].tolist())
     log.info("Random model generated text", text=out)
 
     # Train and eval on train
+    decoder.train()
     train(decoder, optimizer, data, settings.training)
 
     # Generate better output
+    decoder.eval()
     out = data.decode(decoder.generate(context, 50)[0].tolist())
     log.info("Trained model generated text", text=out)

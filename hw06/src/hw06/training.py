@@ -44,7 +44,7 @@ def train(
         batch = data.get_batch("train")
         loss = train_step(model, optimizer, batch)
 
-        if step % 100 == 0:
+        if step % 500 == 0:
             log.info(
                 "Training progress",
                 step=step,
