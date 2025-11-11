@@ -17,6 +17,10 @@ from .model import (
 )
 from .data import Data
 from .training import train
+from .testing import (
+    test_global_causal_masking,
+    test_single_token_causality,
+)
 
 
 def main() -> None:
@@ -26,10 +30,10 @@ def main() -> None:
     log = structlog.get_logger()
     log.info("Settings loaded", settings=settings.model_dump())
 
-    # JAX PRNG
-
+    # JAX PRNG & Globals
     key = jax.random.PRNGKey(settings.random_seed)
     data_key, model_key, dropout_key = jax.random.split(key, num=3)
+    head_size = settings.training.n_embed // settings.training.n_heads
 
     # Dummy input: B,T,C = 16, 32, 64
     x_dummy = jnp.ones(
@@ -40,7 +44,7 @@ def main() -> None:
         )
     )
     B, T, C = x_dummy.shape
-
+    log.info("===== Initializing Test Suite =====")
     ## Test Feed Forward
     ffw = FeedForward(
         n_emb=settings.training.n_embed,
@@ -48,9 +52,8 @@ def main() -> None:
     )
     output = ffw(x_dummy)
     test_out = x_dummy.shape == output.shape
+    log.info("Test: Feed Forward Output shape matches input shape", test=test_out)
 
-    log.info("Feed Forward Output shape matches input shape", test=test_out)
-    head_size = settings.training.n_embed // settings.training.n_heads
     ## Test Attention Head
     att_head = Head(
         head_size=head_size,
@@ -59,10 +62,9 @@ def main() -> None:
     )
     output = att_head(x_dummy)
     test_out = output.shape == (B, T, head_size)
-
-    log.info("Attention Matrix retruns Shape", shape=output.shape)
     log.info(
-        "Attention Output shape matches expectation B, T, head_size", test=test_out
+        "Test: Attention Output shape matches expectation B, T, head_size",
+        test=test_out,
     )
 
     ## Test Multi Head Attention
@@ -74,8 +76,9 @@ def main() -> None:
     )
     output = mh_att(x_dummy)
     test_out = x_dummy.shape == output.shape
-    log.info("Mulit Headed Attention retruns Shape", shape=output.shape)
-    log.info("Multi Headed Attention Output shape matches input shape", test=test_out)
+    log.info(
+        "Test: Multi Headed Attention Output shape matches input shape", test=test_out
+    )
 
     ## Test Block
     block = Block(
@@ -85,9 +88,9 @@ def main() -> None:
     )
     output = block(x_dummy)
     test_out = x_dummy.shape == output.shape
-    log.info("Attention Block Output shape matches input shape", test=test_out)
+    log.info("Test: Attention Block Output shape matches input shape", test=test_out)
 
-    ## Test Decoder
+    ## Test Decoder Causal Mapping
     idx_sequence = jax.random.randint(
         model_key,
         shape=(
@@ -95,8 +98,15 @@ def main() -> None:
             settings.training.context_length,
         ),
         minval=1,
-        maxval=101,
+        maxval=settings.training.vocab_size,
         dtype=jnp.int32,
+    )
+    targets = jnp.ones(
+        (
+            settings.training.batch_size,
+            settings.training.context_length,
+            settings.training.n_embed,
+        )
     )
     decoder = Decoder(
         vocab_size=settings.training.vocab_size,
@@ -106,11 +116,27 @@ def main() -> None:
         n_heads=settings.training.n_heads,
         rngs=nnx.Rngs(params=model_key, dropout=dropout_key),
     )
-    output = decoder(idx_sequence)
-    log.info("Decoder Output shape", shape=output.shape)
-    log.info("Total trainable parameters", n_params=count_params(decoder))
+    global_gradients = test_global_causal_masking(
+        model=decoder,
+        idx_sequence=idx_sequence,
+        targets=targets,
+    )
+    token_gradients = test_single_token_causality(
+        model=decoder,
+        idx_sequence=idx_sequence,
+        target_token_idx=32,
+        targets=targets,
+    )
+    log.info(
+        "Test: Gradient wrt. to all target tokens implicates causality.",
+        grad=global_gradients,
+    )
+    log.info(
+        "Test: Gradient wrt. single target token shows masking.", grad=token_gradients
+    )
 
-    ## Test Data Loading
+    log.info("===== Initializing Training Pipeline =====")
+    ## Data Loading
     data = Data(
         key=data_key,
         batch_size=settings.training.batch_size,
@@ -134,14 +160,21 @@ def main() -> None:
     # Generate some random output
     decoder.eval()
     context = jnp.zeros(shape=(1, 1), dtype=jnp.int32)
-    out = data.decode(decoder.generate(context, 10)[0].tolist())
+    out = data.decode(decoder.generate(context, 20, temp=1.5)[0].tolist())
     log.info("Random model generated text", text=out)
 
-    # Train and eval on train
+    # Train
+    log.info("Total trainable parameters", n_params=count_params(decoder))
     decoder.train()
     train(decoder, optimizer, data, settings.training)
 
     # Generate better output
     decoder.eval()
-    out = data.decode(decoder.generate(context, 50)[0].tolist())
+    out = data.decode(
+        decoder.generate(
+            idx=context,
+            max_new_tokens=20,
+            temp=1.5,
+        )[0].tolist()
+    )
     log.info("Trained model generated text", text=out)

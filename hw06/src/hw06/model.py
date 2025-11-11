@@ -153,11 +153,11 @@ class Decoder(nnx.Module):
         out = self.linear(x)
         return out
 
-    def generate(self, idx: jnp.ndarray, max_new_tokens: int):
+    def generate(self, idx: jnp.ndarray, max_new_tokens: int, temp: float = 1.0):
         for _ in range(max_new_tokens):
             logits = self(idx)
             logits = logits[:, -1, :]
-            probs = jax.nn.softmax(logits)
+            probs = jax.nn.softmax(logits / temp)
             idx_next = jnp.argmax(
                 jax.random.multinomial(
                     key=self.rngs.params(),
