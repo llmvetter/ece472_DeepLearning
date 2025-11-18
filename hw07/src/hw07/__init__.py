@@ -6,7 +6,7 @@ from flax import nnx
 
 from .config import load_settings
 from .data import Data
-from .model import MLP
+from .model import MLP, AutoEncoder
 from .training import train
 from .logging import configure_logging
 from .plotting import plot_boundry
@@ -21,7 +21,7 @@ def main() -> None:
 
     # JAX PRNG
     key = jax.random.PRNGKey(settings.random_seed)
-    data_key, model_key = jax.random.split(key)
+    data_key, mlp_key, ae_key = jax.random.split(key, 3)
     np_rng = np.random.default_rng(np.array(data_key))
 
     log.debug("Generating Data")
@@ -39,17 +39,35 @@ def main() -> None:
         num_outputs=settings.training.num_outputs,
         hidden_activation=nnx.relu,
         output_activation=nnx.identity,
-        rngs=nnx.Rngs(params=model_key),
+        rngs=nnx.Rngs(params=mlp_key),
     )
-
-    log.debug("Initial model", model=model)
 
     optimizer = nnx.Optimizer(
         model,
         optax.adam(settings.training.learning_rate),
         wrt=nnx.Param,
     )
+    # train model wrt to targets
+    train(model, optimizer, data, settings.training, wrt="targets")
 
-    train(model, optimizer, data, settings.training, np_rng)
-
+    # plot decision boundry
     plot_boundry(data=data, model=model, settings=settings.plotting)
+
+    # generate logits data
+    data.logits = model(data.x, get_logits=True)
+
+    # init autoencoder
+    auto_encoder = AutoEncoder(
+        d_mlp=settings.training.layer_width,
+        d_enc=1000,
+        rngs=nnx.Rngs(params=ae_key),
+    )
+
+    optimizer = nnx.Optimizer(
+        auto_encoder,
+        optax.adam(settings.training.learning_rate),
+        wrt=nnx.Param,
+    )
+
+    # train autoencoder wrt to logits
+    train(auto_encoder, optimizer, data, settings.training, wrt="logits")
