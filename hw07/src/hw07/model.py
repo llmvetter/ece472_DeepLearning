@@ -96,6 +96,7 @@ class AutoEncoder(nnx.Module):
         *,
         rngs: nnx.Rngs,
     ):
+        self.d_enc = d_enc
         key_enc, key_dec = jax.random.split(rngs.params(), 2)
         initializer = jax.nn.initializers.he_uniform()
         self.W_enc = nnx.Param(
@@ -109,9 +110,11 @@ class AutoEncoder(nnx.Module):
         self.act = nnx.relu
         self.l1_coeff = 0.005
 
-    def __call__(self, x: jax.Array) -> jax.Array:
+    def __call__(self, x: jax.Array, get_acts: bool = False) -> jax.Array:
         # implements original version, not updated one
         x = x - self.b_dec
         activations = self.act(x @ self.W_enc + self.b_enc)
+        if get_acts is True:
+            return activations
         x_rcst = activations @ self.W_dec + self.b_dec
         return x_rcst
