@@ -15,19 +15,29 @@ class DataSettings(BaseModel):
     """Settings for data generation."""
 
     num_samples: int = 300
-    noise: float = 0.02
+    noise: float = 0.1
 
 
-class TrainingSettings(BaseModel):
-    """Settings for model training."""
+class MLPSettings(BaseModel):
+    """Settings for MLP training."""
 
     num_inputs: int = 2
-    layer_width: int = 200
-    layer_depth: int = 8
+    layer_width: int = 64
+    layer_depth: int = 4
     num_outputs: int = 1
-    batch_size: int = 300
+    batch_size: int = 128
     num_iters: int = 500
     learning_rate: float = 0.001
+
+
+class AESettings(BaseModel):
+    """Settings for AutoEncoder training."""
+
+    layer_width: int = 4096
+    batch_size: int = 512
+    num_iters: int = 300
+    learning_rate: float = 0.001
+    l1_coeff: float = 0.0001
 
 
 class PlottingSettings(BaseModel):
@@ -44,7 +54,8 @@ class AppSettings(BaseSettings):
     debug: bool = False
     random_seed: int = 31451
     data: DataSettings = DataSettings()
-    training: TrainingSettings = TrainingSettings()
+    mlp_training: MLPSettings = MLPSettings()
+    ae_training: AESettings = AESettings()
     plotting: PlottingSettings = PlottingSettings()
 
     model_config = SettingsConfigDict(

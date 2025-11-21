@@ -6,7 +6,7 @@ import structlog
 from flax import nnx
 from tqdm import trange
 
-from .config import TrainingSettings
+from .config import MLPSettings, AESettings
 from .data import Data
 from .model import MLP, AutoEncoder
 
@@ -60,10 +60,10 @@ def train_step(
 
 
 def train(
-    model: MLP,
+    model: MLP | AutoEncoder,
     optimizer: nnx.Optimizer,
     data: Data,
-    settings: TrainingSettings,
+    settings: AESettings | MLPSettings,
     *,
     wrt: Literal["targets", "logits"],
 ) -> None:
