@@ -27,17 +27,18 @@ class MLPSettings(BaseModel):
     num_outputs: int = 1
     batch_size: int = 128
     num_iters: int = 500
-    learning_rate: float = 0.001
+    learning_rate: float = 0.005
 
 
 class AESettings(BaseModel):
     """Settings for AutoEncoder training."""
 
-    layer_width: int = 4096
+    layer_width: int = 512
     batch_size: int = 512
-    num_iters: int = 300
-    learning_rate: float = 0.001
-    l1_coeff: float = 0.0001
+    num_iters: int = 20000
+    learning_rate: float = 0.0001
+    l1_coeff: float = 3
+    sample_multi: int = 50
 
 
 class PlottingSettings(BaseModel):
