@@ -1,6 +1,6 @@
 \documentclass[conference]{IEEEtran}
 \IEEEoverridecommandlockouts
-
+% ! LTeX: language=en-US
 \usepackage{cite}
 \usepackage{url}
 \usepackage{amsmath,amssymb,amsfonts}
@@ -12,7 +12,7 @@
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
-\title{Ethical Arguments for the use of AI-driven productivity monitoring of remote employees}
+\title{Ethical Arguments for the use of AI-driven Monitoring Systems for Remote Employees}
 
 \author{\IEEEauthorblockN{Lennart Vetter}
 \IEEEauthorblockA{\textit{Albert Nerken School of Engineering (The Cooper Union)} \\
@@ -21,8 +21,10 @@ lennart.vetter@cooper.edu}}
 \maketitle
 
 \begin{abstract}
-This paper highlights the effectiveness and the positive business impact of monitoring the productivity of remote workers using biometric data like facial expressions, body posture and eye movement as well as behavioral data like key strokes and mouse movements. 
-The effective utilization of this data in combination with modern AI systems yields promosing improvement in productivity among remote employees, while increasesing cyber security and granting fine grained control over task distribution to the employer.
+This paper presents ethical justifications for using AI-driven Monitoring Systems that 
+incorporate employee biometric data, arguing that these systems are guided by the moral 
+imperative of improving employee welfare, increasing workplace fairness and having a positive business impact.
+\\
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -31,42 +33,44 @@ Algorithmic Control, Surveillance, Machiavellianism, Authoritarianism, Orwellian
 
 \section{The Need for Employee Monitoring} % INTRO
 
-The recent shift to remote work has provided employees with greater flexibility and access to 
-more resources and opportunities. 
-However, these advantages come with several unique challanges: One of the primary difficulties 
+The recent shift to remote work has provided employees with greater workplace flexibility and access to 
+more resources and opportunities. Remote work has effectively increased employee content, saving valuable
+time commuting and x (cite study).
+However, these advantages come with several unique challenges: One of the primary difficulties 
 remote workers face in these online environments is the lack of interaction with their supervisor 
-or collegues. The absence of this personal connection in 
-virtual work environments and the blurring of work and non-work boundaries can negatively impact 
-the motivation of employees, contributing to a sense of isolation and a lack of motivation.
-Moreover, the lack of supervision might negatively impact the safety of employees in their work 
-environment.
+or colleagues. The absence of a personal connection in virtual work environments and the 
+blurring of work and non-work boundaries can negatively impact the motivation of employees, 
+contributing to a sense of isolation and a lack of motivation. In some cases, the lack of human
+supervision even negatively impact the work related safety of employees.
 AI-driven Monitoring Systems describe a set of tools which autonomously track biometric data
 of employees such as facial expressions, eye movements, head position and body posture as 
-well as behavioral data like key strokes and mouse movements in an effort to grant real time and 
-fine grained insights into workers' productivity and health metrics. 
+well as behavioral data like keystrokes and mouse movements in an effort to grant real time and 
+fine-grained insights into workers' productivity and health metrics. 
 
 This systematic review lays out the benefits of implementing AI driven Employee Monitoring Systems.
 These systems provide data driven support for employee well-being, increase and enforce employee 
-workpalce safety, optimize organizational resources and enforce equal accountability benefitting 
-both the employer and the remote employee.
-
-Add some section about work ethics and what can be done from employer perspective with respect to workers
+workplace safety, optimize organizational resources and enforce equal accountability benefitting 
+both the employer and the remote employee all of which serve as a moral justification for the use 
+of these systems.
 
 \section{New Environments, New Challenges} % DISTRACTION / ASSISTANCE
 
 Remote environments differ significantly from traditional office environments. Many factors that 
-emanate from the physical work environment such as the presence of coworkers and 
-adequat work equipment effect workers' productivity and are for the most part absent in remote environments.
-Furthermore, remote environment give rise to distractions from both external factors like 
-environmental disturbances as well as internal factors like low levels of engagement.
+emanate from the physical work environment such as the presence of coworkers,
+adequate work equipment and a dedicated work environment effect workers' productivity and 
+are for the most part absent in remote environments. Furthermore, remote environments give rise 
+to distractions from both external factors like environmental disturbances and internal 
+factors like low levels of engagement.
+
+\subsection{Staying Focused}
 
 These distractions include constant phone notifications, emails, phone calls or other external interruptions. 
 In remote work settings, these distractions are of particular concern as the boundary between work related and 
-non work related tasks blurs. Multitasking, such as reacting to taking care of privat errands or interacting 
+non-work related tasks blurs. Multitasking, such as reacting to and taking care of private errands or interacting 
 with social media, significantly reduces cognitive efficiency \cite{Blasiman2018}.
-Remote workers are particularily vulnerable to distractions that significantly impact their focus and 
+Remote workers are particularly vulnerable to distractions that significantly impact their focus and 
 overall performance outcomes. As \cite{Altmann2014} demonstrated, momentary interruptions, even as 
-brief as a few seconds, can significantly increase error rates by discrupting the cognitive
+brief as a few seconds, can significantly increase error rates by disrupting the cognitive
 processes required to maintain task and sequence continuity. As a result, maintaining concentration 
 and staying focused on a task becomes a major challenge in remote work settings. Understanding, 
 detecting and predicting when remote workers become distracted is therefore of high importance.
@@ -74,99 +78,130 @@ detecting and predicting when remote workers become distracted is therefore of h
 Physiological and biometric signals such as cognitive load, blinking of the eyes, facial expression and 
 body pose have proven highly valuable in predicting the current state of the worker. When integrating these 
 into analytics tools, a more comprehensive insight into the behavior can be obtained.
-Simply by observing the head position \cite{Becerra2025} was able to predict phone distractions 
-with 87\% accuracy. Similarily, \cite{Daza2024} showed that webcam data can be sucesfully leveraged 
-to accuracte predict high and low attention levels by tracking Eyeblink and Facial Expressions. 
+Simply by observing the head position, \cite{Becerra2025} was able to predict phone distractions 
+with 87\% accuracy. Similarly, \cite{Daza2024} showed that webcam data can be successfully leveraged 
+to accurately predict high and low attention levels by tracking eye blinking and facial expressions. 
 A different study showed that by simply measuring body posture and facial expression using a simple 
-webcam in combination with machine learning was able to predict wether or not participants are concentrated 
+webcam in combination with machine learning was able to predict whether participants are concentrated 
 with more than 90\% recall \cite{Betto2022}.
 
 \cite{Kaczorowska2021} showed that assessing the cognitive workload levels using eye tracking data 
-yielded great results. Understadning these different performance metrics such as attention levels and 
-cognitive workload levels is of great importance in analysing human mental fatigue and the performance of 
+yielded great results. Understanding these different performance metrics such as attention levels and 
+cognitive workload levels is of great importance in analyzing human mental fatigue and the performance of 
 intellectual tasks. Biometric data can further be leveraged to "identify sequential interaction patterns 
 associated with moments of distraction" \cite{Rodriguez2023}, offering the unique opportunity to optimize 
-the order of sequential tasks to be performed by the remote employee. Sequential tasks could be 
-recommending based on the worker's current attention level thus maximizing productivity while retaining attention. 
+the order of sequential tasks to be performed by the remote employee. 
 
-Emloyee Monitoring Systems act as an assistant to the employee, working with the employee to by 
-providing real time objective data and guidance to counteract cognitive challanges like distractions and 
-mental fatigue as well as allowing for personalized feedback.
+This shows that tracking biometric data is an effective way to measure employee engagement which opens
+the door to implement systems that assist employees in their work.
+Employee Monitoring Systems act as an assistant to the employee, working with the employee to by 
+providing real time objective data and guidance to counteract cognitive challenges like distractions and 
+mental fatigue as well as allowing for personalized feedback. Such a system would be able to 
+recommend sequential based on the worker's current attention level thus maximizing productivity while 
+retaining attention as well as minimizing distractions and supporting the employee in mantaining focus.
+Hence, the moral justification arises from the supportive nature of these systems.
+
 
 \subsection{Improving Workplace Safety} % SAFETY
 
 Assisting the employee in terms of productivity is not the only capability of modern monitoring systems. 
 When human supervision is absent, these systems watch out for the employees by utilizing the collected 
-biometric and behavioral data to provide real time risk mitigration and personalized workload management. 
-Physical safety of employees is the number one key priority of every work environment. While this might be less of a 
-concern white collar remote work, blue collar Remote Monitoring Systems for industries like the construction 
-industry are able to assist with increasing employee saftety in various ways.
+biometric and behavioral data to provide real time risk mitigation and personalized workload management. 
+Physical safety of employees is the primary ethical and legal obligation of every employer. 
+While this might be less of a concern in white collar remote work, blue collar Remote Monitoring Systems for 
+industries like the Construction Industry are able to assist with increasing employee safety in various ways.
 
-Real-time location tracking of employees, which is particularily useful in environements with reduced visibility,
-can be used to prevent severe injury by avoiding worker collision with heavy machinery or vehicles in motion \cite{Arboleya2021}.
-Monitoring workers using Artificial Intelligence to ensure they are adhering to work place safety regulations like 
-wearing helmets, masks or other required safety equipment to perform their work increases their own saftey and 
-upholds workplace safety regulations \cite{Das2022}.
+Real-time location tracking of employees, which is particularly useful in environments with reduced visibility,
+can be used to prevent severe injury by avoiding worker collision with heavy machinery or vehicles in 
+motion \cite{Arboleya2021}. Moreover, Computer Vision Systems are able to track if workers are utilizing
+adequate safety equipment like wearing helmets or masks \cite{Das2022} for the work they are performing. 
 Mobility related work heavily benefits from using behavioral and biometric data such as 
-eye tracking, blink frequency, facial expressions and head movement in combination with Neural Networks or CNNs to 
-predict driver drowsiness with high degrees of accuracy, preventing sleepiness induced accidents \cite{Shaik2023}.
+eye motion tracking, blink frequency, facial expressions and head movement in combination with Neural 
+Networks to predict driver drowsiness with high degrees of accuracy, preventing sleepiness induced 
+accidents \cite{Shaik2023}.
 
-By using biometric data, these Employee Monitoring Tools can actively improve safety of employees in blue collar work 
-environemnts and ensure that government imposed safety regulations are met.
+By using biometric data, these Remote Monitoring Systems can actively improve safety of employees in 
+blue collar work environments and can also ensure that government imposed safety regulations are met.
+As it is a company's highest ethical commitment to protect workers and ensure their physical safety, 
+the use of these systems is morally justified.
 
 \subsection{Employee Health as a Top Priority} % HEALTH
 
-While safety adressess the workplace as a whole and varios other stakeholders involved, individual employee health
-also benefits tremendously from Remote Employee Monitoring Systems especially in blue collar work environments.
-Physical demands for each worker can be handled in a personalized manner by leveraging
-individual biometric data: Wearable technologies can estimate indivual activity levels through proxies like heart rate,
-which is a physiological variable that has been extensively used to quantify physical demands because of its 
-association with cardiovascular loads \cite{Arias2023}. This essential information can then be used to manage physical
-demands within acceptable limits for each individual. This provides personalized alerts to the employee or
-manager, promoting mandatory pauses or task reallocation based on individual physiological limits.
+While safety addresses the workplace as a whole, individual employee health
+also benefits tremendously from Remote Monitoring Systems, especially in blue collar work environments.
+These systems promise to handle physical demands for each worker in a personalized manner by leveraging
+individual biometric data: Wearable technologies can estimate individual activity levels through proxies 
+like heart rate, which is a physiological variable that has been extensively used to quantify physical 
+demands because of its association with cardiovascular loads \cite{Arias2023}. This essential information 
+can then be used to manage physical demands within acceptable limits for each individual. 
+This provides personalized alerts to the employee or manager, promoting mandatory pauses or task reallocation 
+based on individual physiological limits.
 Especially in construction work, work fatigue leads to poor judgement, increased risk of injuries, 
 decreased productivity and lower quality of work \cite{Abdelhamid2002}. 
 Since physical fatigue is a predominant risk factor for injuries and illnesses in the 
 construction industry, it is essential to monitor fatigue to reduce its adverse effects and prevent long-term 
-health problems. Monitoring biometric data like aerobic fatigue treshold to monitor the fatigue level. \cite{Bangaru2022}
-
-Monitoring systems are not only useful for real-time applications but also provide data for minigating long term 
+health problems which can be achieved by tracking biometric data like aerobic fatigue threshold \cite{Bangaru2022}.
+Monitoring systems are not only useful for real-time applications but also provide data for mitigating long term 
 occupational injury risk. By accumulating biometric data from different employees over time, insights can be 
 gained in which behavioral patterns predict injury risk and consequently conclusions can be drawn to 
-improve longterm workspace safety proceedures and requirements \cite{Khairuddin2022}.
+improve long-term workspace safety procedures and requirements \cite{Khairuddin2022}.
 
-Remote Employee Monitoring Systems therefore go well beyond supervision and proactively promote employee health.
+Remote Monitoring Systems therefore go well beyond supervision and proactively promote employee health. Improving
+employee wellbeing and physical health lays the moral foundation for the use of this technology.
 
 \subsection{Making Informed Decisions} % FAIRNESS AND BUSINESS ASPECTS
-- Using pure biometric signals such as blinking of th eyes, eye tracking,  data is free from bias as these signals are purely performance based and do not carry an 
-inherent bias.
-- Fine grained insights/data allows managers to quickly identify whio is underutilized or overloaded, which helps to
-balance tasks acress team members and ensures equality of contribution. 
-- Allows managers to make informed decisions on who to promote/ give which projects
-- Allows managers to identify non utilized software: Efficient and exhaustive resource utilisation is foundational for sustained business. Obtained insights into worker productivity metrics can subsequently be used to make informed business decisions. The obtained data offer finegrained insights into which tasks
-employees are currently tackling, how much time has been spend on every taks. Precisely knowing how current company resources are utilized opens the opportunity to channel them differently once inefficiencies are discovered. Anectodaly, Ivan Petrovic, CEO and Founder of insughtful, 
-told the story of how a client was able to save \$2 Milion dollars by discovering that non of it's eployees used an expensive piece of software \cite{Piltch2025}.
-Similarily, tracking each remote employee, the employer can quickly determine who is being underutilized and who does too much work. This helps to helps to balance tasks across
-team members, ensuring equality among employees so that everyone contributes equally to the success of the company.
-- Improves security and compliance bu flagging unusual or non work related activity that could pose a risk to
-company data integrety
 
-If a company is unable to ensure company efficiency and security, it might be forced to end remote work policies which 
-would be detremental to employees who rely on that flexibility.
+Beyond improving workplace safety, preventing employee injuries and preserving their health as well as 
+assisting employees in staying focus and avoiding distractions, these systems also benefit the employer side.
+Fine-grained performance insights and data allows managers to quickly identify company inefficiencies. Managers
+are able to see which tasks employees are currently tackling, how much time has been spent on every task. 
+Precisely knowing how current company resources are utilized opens the opportunity to channel them differently 
+once inefficiencies are discovered.
+Anecdotally, Ivan Petrovic, CEO and Founder of Insightful, told the story of how a client was able to save 
+\$2 Million dollars by discovering that none of its employees used an expensive piece of software \cite{Piltch2025}.
+Similarly, tracking each remote employee, the employer can quickly determine who is being underutilized 
+and who does too much work. By providing objective metrics, Monitoring Systems promotes fairness and 
+equality among employees, allowing for an equal balance of tasks and workload across team members which 
+adheres to the moral principle of equal employee contribution to the success of the company.
 
-This is an ethical approach as it provides a transparent framework for employment decisions, moving beyornd subjective
-seat time or management favorism. It is also necessary to ensure the viabilityz ant the organization which is a
-prerequisite for employement.
+Said insights also allow managers to make informed decisions on who to promote and to whom assign specific, high 
+stakes projects based on the performance measures that have been gathered per employee. Leveraging biometric 
+data for promotions and assignments fosters a culture of objective and transparent decisions, moving away from
+subjective bias and management favoritism.
 
-\subsection{The Orweillian Concern}
-Remote Employee Monitoring Tools manifest an unacceptable invasion of privacy and create a monitoring culture that goes 
-well beyond work related data collection.
-This concern is easily adressed as monitoring will be limited to company devices and dedicated work hours only. 
-Employees implicitly consent to this kind of monitoring when accepting remote work flexibility. In the end, monitoring 
-the digital workspace is analogous to a supervisor observing the physical workspace.
+Remote Employee Productivity Monitoring can also serve a dual purpose of improving cyber-security by using the 
+collected biometric and behavioral data such as keystrokes, eye motion, head motion or mouse tracking for 
+continuous biometric authentication \cite{Boshoff2025}, flagging unusual or non-work related activities that 
+could pose a risk to company data integrity. 
+
+Consequently, the use of Remote Employee Productivity Monitoring can be tremendously beneficial to the employing 
+company. If a company is unable to ensure company efficiency and security, it might be forced to end remote 
+work policies which would be detrimental to employees who rely on that flexibility. It is therefore necessary 
+to ensure the viability of the company as a prerequisite for employment.
+
+The following paragraph shall address a common concern that employees might have when Remote Monitoring Systems are 
+used.
+
+\section{The Orwellian Concern}
+Privacy focused employees often strongly reject the idea of having AI driven Monitoring Systems track their biometric
+data during work hours, often stating that this manifests an unacceptable invasion of privacy and creates a 
+monitoring culture that goes well beyond work related data collection. The argument is made that this contradicts 
+the moral obligation of data privacy. This valid concern shall subsequently be addressed.
+
+- proposed system will only monitor employees on work devices and during work hours, thus ensuring that data is only
+for work related purposes
+- collected data is used transparently, the employer communicates the way it is used to the employees, this creates 
+trust (cite study)
+- collected data is used for the benefit of the employee, increases safety, prevents injuries, increases productivity,
+reduces distractions
+- remote work contract can only be upheld if employer can be sure of performance. Monitoring Systems grant security.
+If no such security is given, then the employer might be forced to revoke remote work policy, negatively impacting
+work flexibility for employees.
+- Monitoring the digital workspace shall be analogous to a supervisor observing the physical workspace.
 
 \section{Conclusion}
-Summarizes the argument and offers a final, persuasive thought.
+
+Summarizes the argument and offers a final, persuasive thought. It must rhetorically tie the presented benefits back to the ethical argument promised in the title.
 
 \begin{thebibliography}{00}
 \bibitem{Piltch2025} A. Piltch, ``Bossware booms as bots determine wether you're doing a good job,'' The Register, Nov. 23, 2025. [Online]. Available: \url{https://www.theregister.com/2025/11/23/bossware_monitor_remote_employees}
@@ -184,6 +219,7 @@ Summarizes the argument and offers a final, persuasive thought.
 \bibitem{Das2022} Das Prangon, Abhi Sarafat, Suhreed F., Uddin Jalal, Jahan Shahriar, Lara Roknuzzaman, Kashem Md. (2022). An Intelligent Industrial Safety and Health Monitoring System for Industry 4.0. 
 \bibitem{Shaik2023} Md. Ebrahim Shaik, "A systematic review on detection and prediction of driver drowsiness", Transportation Research Interdisciplinary Perspectives 21 (2023), ISSN 2590-1982, https://doi.org/10.1016/j.trip.2023.100864.
 \bibitem{Abdelhamid2002} Abdelhamid, T. S., and J. G. Everett. (2002). Physiological Demands during Construction Work. \textit{Journal of Construction Engineering and Management}, 128(5), 427--437.
+\bibitem{Boshoff2025} Dutliff Boshoff, Gerhard P. Hancke, "A classifications framework for continuous biometric authentication (2018–2024)", Computers \& Security V. 150 (2025), https://doi.org/10.1016/j.cose.2024.104285.
 \end{thebibliography}
 
 \vspace{12pt}
